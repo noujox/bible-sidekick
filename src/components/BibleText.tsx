@@ -1,6 +1,3 @@
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
-
 interface Verse {
   number: number;
   text: string;
@@ -10,8 +7,6 @@ interface BibleTextProps {
   book: string;
   chapter: string;
   version: string;
-  onPrevious: () => void;
-  onNext: () => void;
 }
 
 // Ejemplo de datos (en producción vendrían de una API)
@@ -62,22 +57,11 @@ export function BibleText({
   book,
   chapter,
   version,
-  onPrevious,
-  onNext,
 }: BibleTextProps) {
   const bookName = book === "john" ? "JUAN" : book.toUpperCase();
 
   return (
-    <div className="relative h-full overflow-y-auto">{/* ... keep existing code */}
-      <Button
-        variant="ghost"
-        size="icon"
-        className="absolute left-0 top-1/2 -translate-y-1/2 z-10 hover:bg-accent"
-        onClick={onPrevious}
-      >
-        <ChevronLeft className="h-6 w-6" />
-      </Button>
-
+    <div className="relative h-full overflow-y-auto">
       <div className="max-w-3xl mx-auto px-16 py-8">
         <h1 className="text-2xl font-bold text-center mb-8 tracking-wide">
           {bookName} {chapter}
@@ -96,15 +80,6 @@ export function BibleText({
           </div>
         </div>
       </div>
-
-      <Button
-        variant="ghost"
-        size="icon"
-        className="absolute right-0 top-1/2 -translate-y-1/2 z-10 hover:bg-accent"
-        onClick={onNext}
-      >
-        <ChevronRight className="h-6 w-6" />
-      </Button>
     </div>
   );
 }

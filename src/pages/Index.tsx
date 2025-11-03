@@ -2,7 +2,7 @@ import { useState } from "react";
 import { BibleSelector } from "@/components/BibleSelector";
 import { BibleText } from "@/components/BibleText";
 import { CommentaryPanel } from "@/components/CommentaryPanel";
-import { Volume2, Type, Columns2 } from "lucide-react";
+import { Volume2, Type, Columns2, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   ResizablePanelGroup,
@@ -61,7 +61,26 @@ const Index = () => {
       </header>
 
       {/* Main Content */}
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 overflow-hidden relative">
+        {/* Floating Navigation Buttons */}
+        <Button
+          variant="ghost"
+          size="icon"
+          className="fixed left-4 top-1/2 -translate-y-1/2 z-50 hover:bg-accent rounded-full h-12 w-12 shadow-lg bg-card/80 backdrop-blur-sm"
+          onClick={handlePrevious}
+        >
+          <ChevronLeft className="h-6 w-6" />
+        </Button>
+
+        <Button
+          variant="ghost"
+          size="icon"
+          className="fixed right-4 top-1/2 -translate-y-1/2 z-50 hover:bg-accent rounded-full h-12 w-12 shadow-lg bg-card/80 backdrop-blur-sm"
+          onClick={handleNext}
+        >
+          <ChevronRight className="h-6 w-6" />
+        </Button>
+
         {showCommentary ? (
           <ResizablePanelGroup direction="horizontal" className="h-full">
             <ResizablePanel defaultSize={50} minSize={30}>
@@ -69,8 +88,6 @@ const Index = () => {
                 book={book}
                 chapter={chapter}
                 version={version}
-                onPrevious={handlePrevious}
-                onNext={handleNext}
               />
             </ResizablePanel>
             
@@ -85,8 +102,6 @@ const Index = () => {
             book={book}
             chapter={chapter}
             version={version}
-            onPrevious={handlePrevious}
-            onNext={handleNext}
           />
         )}
       </div>
