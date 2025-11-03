@@ -7,6 +7,8 @@ interface BibleTextProps {
   book: string;
   chapter: string;
   version: string;
+  fontSize?: string;
+  fontFamily?: string;
 }
 
 // Ejemplo de datos (en producción vendrían de una API)
@@ -57,8 +59,23 @@ export function BibleText({
   book,
   chapter,
   version,
+  fontSize = "medium",
+  fontFamily = "serif",
 }: BibleTextProps) {
   const bookName = book === "john" ? "JUAN" : book.toUpperCase();
+
+  const sizeClasses = {
+    small: "text-sm",
+    medium: "text-base",
+    large: "text-lg",
+    xlarge: "text-xl",
+  };
+
+  const fontClasses = {
+    serif: "font-serif",
+    sans: "font-sans",
+    mono: "font-mono",
+  };
 
   return (
     <div className="relative h-full overflow-y-auto">
@@ -70,7 +87,7 @@ export function BibleText({
         <div className="space-y-6">
           <h2 className="bible-heading">El Verbo hecho carne</h2>
           
-          <div className="bible-text space-y-3">
+          <div className={`bible-text space-y-3 ${sizeClasses[fontSize as keyof typeof sizeClasses]} ${fontClasses[fontFamily as keyof typeof fontClasses]}`}>
             {SAMPLE_TEXT.map((verse) => (
               <p key={verse.number}>
                 <sup className="verse-number">{verse.number}</sup>

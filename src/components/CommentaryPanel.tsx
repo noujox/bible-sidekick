@@ -11,6 +11,8 @@ import { useState } from "react";
 interface CommentaryPanelProps {
   book: string;
   chapter: string;
+  fontSize?: string;
+  fontFamily?: string;
 }
 
 const COMMENTARIES = [
@@ -43,9 +45,22 @@ En Él estaba la vida, no solo existencia física, sino vida espiritual y eterna
 Las tinieblas representan el pecado, la ignorancia espiritual y la muerte. Aunque la luz resplandece, las tinieblas intentaron comprenderla o apagarla, pero no prevalecieron. Esta es una profecía del rechazo de Cristo y Su victoria final.
 `;
 
-export function CommentaryPanel({ book, chapter }: CommentaryPanelProps) {
+export function CommentaryPanel({ book, chapter, fontSize = "medium", fontFamily = "serif" }: CommentaryPanelProps) {
   const [commentary, setCommentary] = useState("matthew-henry");
   const bookName = book === "john" ? "JUAN" : book.toUpperCase();
+
+  const sizeClasses = {
+    small: "text-sm",
+    medium: "text-base",
+    large: "text-lg",
+    xlarge: "text-xl",
+  };
+
+  const fontClasses = {
+    serif: "font-serif",
+    sans: "font-sans",
+    mono: "font-mono",
+  };
 
   return (
     <div className="h-full flex flex-col bg-background">
@@ -71,7 +86,7 @@ export function CommentaryPanel({ book, chapter }: CommentaryPanelProps) {
           <h3 className="text-xl font-semibold mb-4 text-heading">
             Comentario Bíblico
           </h3>
-          <div className="prose prose-invert prose-sm max-w-none space-y-4 text-foreground leading-relaxed">
+          <div className={`prose prose-invert prose-sm max-w-none space-y-4 text-foreground leading-relaxed ${sizeClasses[fontSize as keyof typeof sizeClasses]} ${fontClasses[fontFamily as keyof typeof fontClasses]}`}>
             {SAMPLE_COMMENTARY.split('\n\n').map((paragraph, i) => {
               if (paragraph.startsWith('**')) {
                 const text = paragraph.replace(/\*\*/g, '');
