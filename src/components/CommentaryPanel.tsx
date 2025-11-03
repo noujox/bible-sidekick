@@ -8,6 +8,11 @@ import {
 } from "@/components/ui/select";
 import { useState } from "react";
 
+interface CommentaryPanelProps {
+  book: string;
+  chapter: string;
+}
+
 const COMMENTARIES = [
   { value: "matthew-henry", label: "Matthew Henry" },
   { value: "jamieson", label: "Jamieson-Fausset-Brown" },
@@ -38,12 +43,15 @@ En Él estaba la vida, no solo existencia física, sino vida espiritual y eterna
 Las tinieblas representan el pecado, la ignorancia espiritual y la muerte. Aunque la luz resplandece, las tinieblas intentaron comprenderla o apagarla, pero no prevalecieron. Esta es una profecía del rechazo de Cristo y Su victoria final.
 `;
 
-export function CommentaryPanel() {
+export function CommentaryPanel({ book, chapter }: CommentaryPanelProps) {
   const [commentary, setCommentary] = useState("matthew-henry");
+  const bookName = book === "john" ? "JUAN" : book.toUpperCase();
 
   return (
-    <div className="h-full flex flex-col bg-background">{/* ... keep existing code */}
+    <div className="h-full flex flex-col bg-background">
       <div className="p-4 border-b border-border">
+        <h2 className="text-lg font-semibold mb-3">Comentarios Bíblicos</h2>
+        <p className="text-sm text-muted-foreground mb-3">{bookName} {chapter}</p>
         <Select value={commentary} onValueChange={setCommentary}>
           <SelectTrigger className="w-full bg-secondary border-border">
             <SelectValue placeholder="Seleccionar comentario" />

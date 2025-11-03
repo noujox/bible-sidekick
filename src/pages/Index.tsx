@@ -94,7 +94,7 @@ const Index = () => {
             <ResizableHandle className="w-1 bg-border hover:bg-accent transition-colors" />
             
             <ResizablePanel defaultSize={50} minSize={30}>
-              <CommentaryPanel />
+              <CommentaryPanel book={book} chapter={chapter} />
             </ResizablePanel>
           </ResizablePanelGroup>
         ) : (
