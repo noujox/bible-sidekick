@@ -42,7 +42,7 @@ export function CommentaryPanel() {
   const [commentary, setCommentary] = useState("matthew-henry");
 
   return (
-    <div className="w-full lg:w-1/2 border-l border-border flex flex-col">
+    <div className="h-full flex flex-col bg-background">{/* ... keep existing code */}
       <div className="p-4 border-b border-border">
         <Select value={commentary} onValueChange={setCommentary}>
           <SelectTrigger className="w-full bg-secondary border-border">

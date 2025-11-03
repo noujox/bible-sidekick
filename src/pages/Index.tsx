@@ -4,6 +4,11 @@ import { BibleText } from "@/components/BibleText";
 import { CommentaryPanel } from "@/components/CommentaryPanel";
 import { Volume2, Type, Columns2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  ResizablePanelGroup,
+  ResizablePanel,
+  ResizableHandle,
+} from "@/components/ui/resizable";
 
 const Index = () => {
   const [book, setBook] = useState("john");
@@ -56,16 +61,34 @@ const Index = () => {
       </header>
 
       {/* Main Content */}
-      <div className="flex flex-1 overflow-hidden">
-        <BibleText
-          book={book}
-          chapter={chapter}
-          version={version}
-          onPrevious={handlePrevious}
-          onNext={handleNext}
-        />
-        
-        {showCommentary && <CommentaryPanel />}
+      <div className="flex-1 overflow-hidden">
+        {showCommentary ? (
+          <ResizablePanelGroup direction="horizontal" className="h-full">
+            <ResizablePanel defaultSize={50} minSize={30}>
+              <BibleText
+                book={book}
+                chapter={chapter}
+                version={version}
+                onPrevious={handlePrevious}
+                onNext={handleNext}
+              />
+            </ResizablePanel>
+            
+            <ResizableHandle className="w-1 bg-border hover:bg-accent transition-colors" />
+            
+            <ResizablePanel defaultSize={50} minSize={30}>
+              <CommentaryPanel />
+            </ResizablePanel>
+          </ResizablePanelGroup>
+        ) : (
+          <BibleText
+            book={book}
+            chapter={chapter}
+            version={version}
+            onPrevious={handlePrevious}
+            onNext={handleNext}
+          />
+        )}
       </div>
     </div>
   );

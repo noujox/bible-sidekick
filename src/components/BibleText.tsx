@@ -68,7 +68,7 @@ export function BibleText({
   const bookName = book === "john" ? "JUAN" : book.toUpperCase();
 
   return (
-    <div className="relative flex-1">
+    <div className="relative h-full overflow-y-auto">{/* ... keep existing code */}
       <Button
         variant="ghost"
         size="icon"
