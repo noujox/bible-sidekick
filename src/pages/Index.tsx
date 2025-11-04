@@ -2,7 +2,7 @@ import { useState } from "react";
 import { BibleSelector } from "@/components/BibleSelector";
 import { BibleText } from "@/components/BibleText";
 import { CommentaryPanel } from "@/components/CommentaryPanel";
-import { Volume2, Type, Columns2, ChevronLeft, ChevronRight, BookOpen, FileText } from "lucide-react";
+import { Type, Columns2, ChevronLeft, ChevronRight, BookOpen, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
 import {
@@ -60,10 +60,6 @@ const Index = () => {
           />
 
           <div className="flex items-center gap-1 sm:gap-2">
-            <Button variant="ghost" size="icon" className="hover:bg-accent h-8 w-8 sm:h-10 sm:w-10">
-              <Volume2 className="h-4 w-4 sm:h-5 sm:w-5" />
-            </Button>
-            
             <Popover>
               <PopoverTrigger asChild>
                 <Button variant="ghost" size="icon" className="hover:bg-accent h-8 w-8 sm:h-10 sm:w-10">
