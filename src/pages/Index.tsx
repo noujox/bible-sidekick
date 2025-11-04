@@ -2,8 +2,9 @@ import { useState } from "react";
 import { BibleSelector } from "@/components/BibleSelector";
 import { BibleText } from "@/components/BibleText";
 import { CommentaryPanel } from "@/components/CommentaryPanel";
-import { Volume2, Type, Columns2, ChevronLeft, ChevronRight } from "lucide-react";
+import { Volume2, Type, Columns2, ChevronLeft, ChevronRight, BookOpen, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useIsMobile } from "@/hooks/use-mobile";
 import {
   Popover,
   PopoverContent,
@@ -24,12 +25,14 @@ import {
 } from "@/components/ui/resizable";
 
 const Index = () => {
+  const isMobile = useIsMobile();
   const [book, setBook] = useState("john");
   const [chapter, setChapter] = useState("1");
   const [version, setVersion] = useState("rvr1960");
   const [showCommentary, setShowCommentary] = useState(true);
   const [fontSize, setFontSize] = useState("medium");
   const [fontFamily, setFontFamily] = useState("serif");
+  const [mobileView, setMobileView] = useState<"bible" | "commentary">("bible");
 
   const handlePrevious = () => {
     const ch = parseInt(chapter);
@@ -103,14 +106,16 @@ const Index = () => {
               </PopoverContent>
             </Popover>
 
-            <Button
-              variant="ghost"
-              size="icon"
-              className="hover:bg-accent"
-              onClick={() => setShowCommentary(!showCommentary)}
-            >
-              <Columns2 className="h-5 w-5" />
-            </Button>
+            {!isMobile && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="hover:bg-accent"
+                onClick={() => setShowCommentary(!showCommentary)}
+              >
+                <Columns2 className="h-5 w-5" />
+              </Button>
+            )}
           </div>
         </div>
       </header>
@@ -136,7 +141,46 @@ const Index = () => {
           <ChevronRight className="h-6 w-6" />
         </Button>
 
-        {showCommentary ? (
+{isMobile ? (
+          <>
+            {mobileView === "bible" ? (
+              <BibleText
+                book={book}
+                chapter={chapter}
+                version={version}
+                fontSize={fontSize}
+                fontFamily={fontFamily}
+              />
+            ) : (
+              <CommentaryPanel 
+                book={book} 
+                chapter={chapter}
+                fontSize={fontSize}
+                fontFamily={fontFamily}
+              />
+            )}
+            
+            {/* Mobile toggle button */}
+            <Button
+              variant="default"
+              size="lg"
+              className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 shadow-lg gap-2"
+              onClick={() => setMobileView(mobileView === "bible" ? "commentary" : "bible")}
+            >
+              {mobileView === "bible" ? (
+                <>
+                  <FileText className="h-5 w-5" />
+                  Ver Comentarios
+                </>
+              ) : (
+                <>
+                  <BookOpen className="h-5 w-5" />
+                  Ver Biblia
+                </>
+              )}
+            </Button>
+          </>
+        ) : showCommentary ? (
           <ResizablePanelGroup direction="horizontal" className="h-full">
             <ResizablePanel defaultSize={50} minSize={30}>
               <BibleText
