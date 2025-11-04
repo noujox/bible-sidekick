@@ -49,7 +49,7 @@ const Index = () => {
     <div className="min-h-screen flex flex-col bg-background">
       {/* Header */}
       <header className="border-b border-border bg-card">
-        <div className="flex items-center justify-between px-6 py-3">
+        <div className="flex items-center justify-between px-2 sm:px-6 py-3 gap-2">
           <BibleSelector
             book={book}
             chapter={chapter}
@@ -59,15 +59,15 @@ const Index = () => {
             onVersionChange={setVersion}
           />
 
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" className="hover:bg-accent">
-              <Volume2 className="h-5 w-5" />
+          <div className="flex items-center gap-1 sm:gap-2">
+            <Button variant="ghost" size="icon" className="hover:bg-accent h-8 w-8 sm:h-10 sm:w-10">
+              <Volume2 className="h-4 w-4 sm:h-5 sm:w-5" />
             </Button>
             
             <Popover>
               <PopoverTrigger asChild>
-                <Button variant="ghost" size="icon" className="hover:bg-accent">
-                  <Type className="h-5 w-5" />
+                <Button variant="ghost" size="icon" className="hover:bg-accent h-8 w-8 sm:h-10 sm:w-10">
+                  <Type className="h-4 w-4 sm:h-5 sm:w-5" />
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-80">
@@ -110,10 +110,10 @@ const Index = () => {
               <Button
                 variant="ghost"
                 size="icon"
-                className="hover:bg-accent"
+                className="hover:bg-accent h-8 w-8 sm:h-10 sm:w-10"
                 onClick={() => setShowCommentary(!showCommentary)}
               >
-                <Columns2 className="h-5 w-5" />
+                <Columns2 className="h-4 w-4 sm:h-5 sm:w-5" />
               </Button>
             )}
           </div>

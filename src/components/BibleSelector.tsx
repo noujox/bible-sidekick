@@ -44,10 +44,10 @@ export function BibleSelector({
   const chapters = Array.from({ length: 50 }, (_, i) => (i + 1).toString());
 
   return (
-    <div className="flex gap-3 items-center">
+    <div className="flex gap-1.5 sm:gap-3 items-center w-full sm:w-auto">
       <Select value={book} onValueChange={onBookChange}>
-        <SelectTrigger className="w-[180px] bg-secondary border-border">
-          <SelectValue placeholder="Seleccionar libro" />
+        <SelectTrigger className="w-[120px] sm:w-[180px] bg-secondary border-border text-sm sm:text-base">
+          <SelectValue placeholder="Libro" />
         </SelectTrigger>
         <SelectContent className="bg-popover border-border">
           {BOOKS.map((b) => (
@@ -59,7 +59,7 @@ export function BibleSelector({
       </Select>
 
       <Select value={chapter} onValueChange={onChapterChange}>
-        <SelectTrigger className="w-[100px] bg-secondary border-border">
+        <SelectTrigger className="w-[70px] sm:w-[100px] bg-secondary border-border text-sm sm:text-base">
           <SelectValue placeholder="Cap." />
         </SelectTrigger>
         <SelectContent className="bg-popover border-border max-h-[300px]">
@@ -72,8 +72,8 @@ export function BibleSelector({
       </Select>
 
       <Select value={version} onValueChange={onVersionChange}>
-        <SelectTrigger className="w-[120px] bg-secondary border-border">
-          <SelectValue placeholder="Versión" />
+        <SelectTrigger className="w-[90px] sm:w-[120px] bg-secondary border-border text-sm sm:text-base">
+          <SelectValue placeholder="Ver." />
         </SelectTrigger>
         <SelectContent className="bg-popover border-border">
           {VERSIONS.map((v) => (
