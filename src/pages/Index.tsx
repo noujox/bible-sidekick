@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { BibleSelector } from "@/components/BibleSelector";
 import { BibleText } from "@/components/BibleText";
 import { CommentaryPanel } from "@/components/CommentaryPanel";
@@ -33,6 +33,34 @@ const Index = () => {
   const [fontSize, setFontSize] = useState("medium");
   const [fontFamily, setFontFamily] = useState("serif");
   const [mobileView, setMobileView] = useState<"bible" | "commentary">("bible");
+  const [showNavButtons, setShowNavButtons] = useState(true);
+  const hideTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    const resetTimer = () => {
+      setShowNavButtons(true);
+      if (hideTimerRef.current) {
+        clearTimeout(hideTimerRef.current);
+      }
+      hideTimerRef.current = setTimeout(() => {
+        setShowNavButtons(false);
+      }, 3000);
+    };
+
+    const handleScroll = () => {
+      resetTimer();
+    };
+
+    resetTimer();
+    window.addEventListener('scroll', handleScroll, true);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll, true);
+      if (hideTimerRef.current) {
+        clearTimeout(hideTimerRef.current);
+      }
+    };
+  }, []);
 
   const handlePrevious = () => {
     const ch = parseInt(chapter);
@@ -122,7 +150,9 @@ const Index = () => {
         <Button
           variant="ghost"
           size="icon"
-          className="fixed left-4 top-1/2 -translate-y-1/2 z-50 hover:bg-accent rounded-full h-12 w-12 shadow-lg bg-card/80 backdrop-blur-sm"
+          className={`fixed top-1/2 -translate-y-1/2 z-50 hover:bg-accent rounded-full h-12 w-12 shadow-lg bg-card/80 backdrop-blur-sm transition-all duration-300 ${
+            showNavButtons ? 'left-4 opacity-100' : '-left-12 opacity-0'
+          }`}
           onClick={handlePrevious}
         >
           <ChevronLeft className="h-6 w-6" />
@@ -131,7 +161,9 @@ const Index = () => {
         <Button
           variant="ghost"
           size="icon"
-          className="fixed right-4 top-1/2 -translate-y-1/2 z-50 hover:bg-accent rounded-full h-12 w-12 shadow-lg bg-card/80 backdrop-blur-sm"
+          className={`fixed top-1/2 -translate-y-1/2 z-50 hover:bg-accent rounded-full h-12 w-12 shadow-lg bg-card/80 backdrop-blur-sm transition-all duration-300 ${
+            showNavButtons ? 'right-4 opacity-100' : '-right-12 opacity-0'
+          }`}
           onClick={handleNext}
         >
           <ChevronRight className="h-6 w-6" />
