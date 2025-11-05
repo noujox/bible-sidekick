@@ -70,10 +70,10 @@ export function BibleSelector({
             variant="outline"
             role="combobox"
             aria-expanded={openBook}
-            className="w-[120px] sm:w-[180px] justify-between bg-secondary border-border text-sm sm:text-base"
+            className="w-[120px] sm:w-[180px] justify-between bg-secondary border-border text-sm sm:text-base px-2 sm:px-4"
           >
-            {selectedBook?.label || "Libro"}
-            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            <span className="truncate">{selectedBook?.label || "Libro"}</span>
+            <ChevronsUpDown className="ml-1 sm:ml-2 h-3 w-3 sm:h-4 sm:w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-[200px] p-0 bg-popover border-border">
@@ -113,10 +113,10 @@ export function BibleSelector({
         <PopoverTrigger asChild>
           <Button
             variant="outline"
-            className="w-[70px] sm:w-[100px] justify-between bg-secondary border-border text-sm sm:text-base"
+            className="w-[70px] sm:w-[100px] justify-between bg-secondary border-border text-sm sm:text-base px-2 sm:px-4"
           >
-            Cap. {chapter}
-            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            <span className="truncate">Cap. {chapter}</span>
+            <ChevronsUpDown className="ml-1 sm:ml-2 h-3 w-3 sm:h-4 sm:w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-[280px] sm:w-[520px] p-4 bg-popover border-border">
@@ -146,10 +146,10 @@ export function BibleSelector({
         <PopoverTrigger asChild>
           <Button
             variant="outline"
-            className="w-[90px] sm:w-[120px] justify-between bg-secondary border-border text-sm sm:text-base"
+            className="w-[90px] sm:w-[120px] justify-between bg-secondary border-border text-sm sm:text-base px-2 sm:px-4"
           >
-            {selectedVersion?.label || "Ver."}
-            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            <span className="truncate">{selectedVersion?.label || "Ver."}</span>
+            <ChevronsUpDown className="ml-1 sm:ml-2 h-3 w-3 sm:h-4 sm:w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-[150px] p-2 bg-popover border-border">
