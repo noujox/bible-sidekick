@@ -26,9 +26,9 @@ import {
 
 const Index = () => {
   const isMobile = useIsMobile();
-  const [book, setBook] = useState("john");
+  const [book, setBook] = useState("juan");
   const [chapter, setChapter] = useState("1");
-  const [version, setVersion] = useState("rvr1960");
+  const [version, setVersion] = useState("RV1960");
   const [showCommentary, setShowCommentary] = useState(true);
   const [fontSize, setFontSize] = useState("medium");
   const [fontFamily, setFontFamily] = useState("serif");

@@ -1,0 +1,13 @@
+project_id = "brseeiykizdfgafczbee"
+
+[functions.get-bible-chapter]
+verify_jwt = false
+
+[functions.get-bible-books]
+verify_jwt = false
+
+[functions.get-bible-commentary]
+verify_jwt = false
+
+[functions.get-bible-versions]
+verify_jwt = false
