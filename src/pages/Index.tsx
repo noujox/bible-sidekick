@@ -38,11 +38,7 @@ const Index = () => {
   const [mobileView, setMobileView] = useState<"bible" | "commentary">("bible");
   const [showNavButtons, setShowNavButtons] = useState(true);
   const hideTimerRef = useRef<NodeJS.Timeout | null>(null);
-
-  if (loading) {
-    return <DbLoadingScreen progress={progress} fromCache={fromCache} />;
-  }
-
+  
   useEffect(() => {
     const resetTimer = () => {
       setShowNavButtons(true);
@@ -68,6 +64,11 @@ const Index = () => {
       }
     };
   }, []);
+  
+  if (loading) {
+    return <DbLoadingScreen progress={progress} fromCache={fromCache} />;
+  }
+
 
   const handlePrevious = () => {
     const ch = parseInt(chapter);
