@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { BibleSelector } from "@/components/BibleSelector";
 import { BibleText } from "@/components/BibleText";
 import { CommentaryPanel } from "@/components/CommentaryPanel";
+import { DbLoadingScreen } from "@/components/DbLoadingScreen";
 import { Type, Columns2, ChevronLeft, ChevronRight, BookOpen, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -23,9 +24,11 @@ import {
   ResizablePanel,
   ResizableHandle,
 } from "@/components/ui/resizable";
+import { useSqliteDb } from "@/hooks/use-sqlite-db";
 
 const Index = () => {
   const isMobile = useIsMobile();
+  const { loading, progress, fromCache } = useSqliteDb();
   const [book, setBook] = useState("john");
   const [chapter, setChapter] = useState("1");
   const [version, setVersion] = useState("rvr1960");
@@ -35,6 +38,10 @@ const Index = () => {
   const [mobileView, setMobileView] = useState<"bible" | "commentary">("bible");
   const [showNavButtons, setShowNavButtons] = useState(true);
   const hideTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  if (loading) {
+    return <DbLoadingScreen progress={progress} fromCache={fromCache} />;
+  }
 
   useEffect(() => {
     const resetTimer = () => {

@@ -7,6 +7,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useState } from "react";
+import { useBibleCommentary, useBibleBooks } from "@/hooks/use-bible-data";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface CommentaryPanelProps {
   book: string;
@@ -22,32 +24,13 @@ const COMMENTARIES = [
   { value: "gill", label: "Gill's Exposition" },
 ];
 
-const SAMPLE_COMMENTARY = `
-**Versículos 1-5: El Verbo eterno**
-
-"En el principio era el Verbo" - Esta declaración establece la preexistencia eterna del Verbo (Logos). Juan usa un término filosófico conocido tanto por judíos como griegos, pero lo llena con contenido cristiano único.
-
-El apóstol Juan presenta tres verdades fundamentales sobre el Verbo:
-1. Su eternidad: "era" en el principio
-2. Su relación con Dios: "era con Dios"
-3. Su deidad: "era Dios"
-
-**La creación por el Verbo**
-
-Todas las cosas fueron hechas por medio de Él. Esto contradice cualquier filosofía que vea la materia como eterna o malvada. El Verbo es el agente activo de la creación.
-
-**La vida y la luz**
-
-En Él estaba la vida, no solo existencia física, sino vida espiritual y eterna. Esta vida es la luz de los hombres, revelando tanto su condición pecaminosa como el camino de salvación.
-
-**El conflicto con las tinieblas**
-
-Las tinieblas representan el pecado, la ignorancia espiritual y la muerte. Aunque la luz resplandece, las tinieblas intentaron comprenderla o apagarla, pero no prevalecieron. Esta es una profecía del rechazo de Cristo y Su victoria final.
-`;
-
 export function CommentaryPanel({ book, chapter, fontSize = "medium", fontFamily = "serif" }: CommentaryPanelProps) {
   const [commentary, setCommentary] = useState("matthew-henry");
-  const bookName = book === "john" ? "JUAN" : book.toUpperCase();
+  const { commentary: commentaryData, loading } = useBibleCommentary(book, parseInt(chapter), commentary);
+  const { books } = useBibleBooks();
+
+  const bookData = books.find((b) => b.codigo === book);
+  const bookName = bookData?.nombre || book.toUpperCase();
 
   const sizeClasses = {
     small: "text-sm",
@@ -86,23 +69,32 @@ export function CommentaryPanel({ book, chapter, fontSize = "medium", fontFamily
           <h3 className="text-xl font-semibold mb-4 text-heading">
             Comentario Bíblico
           </h3>
-          <div className={`prose prose-invert prose-sm max-w-none space-y-4 text-foreground leading-relaxed ${sizeClasses[fontSize as keyof typeof sizeClasses]} ${fontClasses[fontFamily as keyof typeof fontClasses]}`}>
-            {SAMPLE_COMMENTARY.split('\n\n').map((paragraph, i) => {
-              if (paragraph.startsWith('**')) {
-                const text = paragraph.replace(/\*\*/g, '');
-                return (
-                  <h4 key={i} className="bible-heading text-base mt-6 mb-3">
-                    {text}
+          
+          {loading ? (
+            <div className="space-y-4">
+              <Skeleton className="h-6 w-full" />
+              <Skeleton className="h-6 w-full" />
+              <Skeleton className="h-6 w-3/4" />
+              <Skeleton className="h-6 w-full" />
+            </div>
+          ) : commentaryData.length === 0 ? (
+            <div className="text-muted-foreground">
+              No hay comentarios disponibles para este capítulo en la versión seleccionada.
+            </div>
+          ) : (
+            <div className={`prose prose-invert prose-sm max-w-none space-y-4 text-foreground leading-relaxed ${sizeClasses[fontSize as keyof typeof sizeClasses]} ${fontClasses[fontFamily as keyof typeof fontClasses]}`}>
+              {commentaryData.map((item, i) => (
+                <div key={i} className="space-y-2">
+                  <h4 className="bible-heading text-base mt-6 mb-3">
+                    Versículo{item.versiculo_fin ? `s ${item.versiculo_inicio}-${item.versiculo_fin}` : ` ${item.versiculo_inicio}`}
                   </h4>
-                );
-              }
-              return (
-                <p key={i} className="text-foreground">
-                  {paragraph}
-                </p>
-              );
-            })}
-          </div>
+                  <p className="text-foreground whitespace-pre-wrap">
+                    {item.texto_comentario}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </ScrollArea>
     </div>

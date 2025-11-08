@@ -16,6 +16,8 @@ import {
 import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useBibleBooks, useBibleVersions } from "@/hooks/use-bible-data";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface BibleSelectorProps {
   book: string;
@@ -25,24 +27,6 @@ interface BibleSelectorProps {
   onChapterChange: (chapter: string) => void;
   onVersionChange: (version: string) => void;
 }
-
-const BOOKS = [
-  { value: "genesis", label: "Génesis", chapters: 50 },
-  { value: "exodus", label: "Éxodo", chapters: 40 },
-  { value: "john", label: "Juan", chapters: 21 },
-  { value: "matthew", label: "Mateo", chapters: 28 },
-  { value: "mark", label: "Marcos", chapters: 16 },
-  { value: "luke", label: "Lucas", chapters: 24 },
-  { value: "acts", label: "Hechos", chapters: 28 },
-  { value: "romans", label: "Romanos", chapters: 16 },
-];
-
-const VERSIONS = [
-  { value: "rvr1960", label: "RVR1960" },
-  { value: "nvi", label: "NVI" },
-  { value: "lbla", label: "LBLA" },
-  { value: "dhh", label: "DHH" },
-];
 
 export function BibleSelector({
   book,
@@ -56,10 +40,34 @@ export function BibleSelector({
   const [openChapter, setOpenChapter] = useState(false);
   const [openVersion, setOpenVersion] = useState(false);
 
-  const selectedBook = BOOKS.find((b) => b.value === book);
-  const selectedVersion = VERSIONS.find((v) => v.value === version);
+  const { books, loading: loadingBooks } = useBibleBooks();
+  const { versions, loading: loadingVersions } = useBibleVersions();
+
+  const booksData = books.map((b) => ({
+    value: b.codigo,
+    label: b.nombre,
+    chapters: b.total_capitulos,
+  }));
+
+  const versionsData = versions.map((v) => ({
+    value: v.codigo,
+    label: v.abreviatura || v.nombre,
+  }));
+
+  const selectedBook = booksData.find((b) => b.value === book);
+  const selectedVersion = versionsData.find((v) => v.value === version);
   const chapterCount = selectedBook?.chapters || 50;
   const chapters = Array.from({ length: chapterCount }, (_, i) => i + 1);
+
+  if (loadingBooks || loadingVersions) {
+    return (
+      <div className="flex gap-1.5 sm:gap-3 items-center w-full sm:w-auto">
+        <Skeleton className="w-[120px] sm:w-[180px] h-9" />
+        <Skeleton className="w-[70px] sm:w-[100px] h-9" />
+        <Skeleton className="w-[90px] sm:w-[120px] h-9" />
+      </div>
+    );
+  }
 
   return (
     <div className="flex gap-1.5 sm:gap-3 items-center w-full sm:w-auto">
@@ -83,7 +91,7 @@ export function BibleSelector({
               <CommandEmpty>No se encontró el libro.</CommandEmpty>
               <CommandGroup>
                 <ScrollArea className="h-[300px]">
-                  {BOOKS.map((b) => (
+                  {booksData.map((b) => (
                     <CommandItem
                       key={b.value}
                       value={b.label}
@@ -154,7 +162,7 @@ export function BibleSelector({
         </PopoverTrigger>
         <PopoverContent className="w-[150px] p-2 bg-popover border-border">
           <div className="flex flex-col gap-1">
-            {VERSIONS.map((v) => (
+            {versionsData.map((v) => (
               <Button
                 key={v.value}
                 variant={version === v.value ? "default" : "ghost"}
