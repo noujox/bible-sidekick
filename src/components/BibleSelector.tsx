@@ -97,7 +97,9 @@ export function BibleSelector({
                       value={b.label}
                       onSelect={() => {
                         onBookChange(b.value);
+                        onChapterChange("1");
                         setOpenBook(false);
+                        setTimeout(() => setOpenChapter(true), 100);
                       }}
                     >
                       {b.label}
