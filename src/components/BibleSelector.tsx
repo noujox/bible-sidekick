@@ -80,7 +80,7 @@ export function BibleSelector({
             aria-expanded={openBook}
             className="w-[120px] sm:w-[180px] justify-between bg-secondary border-border text-sm sm:text-base px-2 sm:px-4"
           >
-            <span className="truncate">{selectedBook?.label || "Libro"}</span>
+            <span className="truncate">{selectedBook?.label || book}</span>
             <ChevronsUpDown className="hidden sm:block ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
@@ -156,7 +156,7 @@ export function BibleSelector({
             variant="outline"
             className="w-[90px] sm:w-[120px] justify-between bg-secondary border-border text-sm sm:text-base px-2 sm:px-4"
           >
-            <span className="truncate">{selectedVersion?.label || "Ver."}</span>
+            <span className="truncate">{selectedVersion?.label || version}</span>
             <ChevronsUpDown className="hidden sm:block ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
