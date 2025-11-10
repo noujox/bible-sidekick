@@ -9,9 +9,9 @@ interface Book {
 }
 
 interface Version {
+  id: number;
   codigo: string;
   nombre: string;
-  abreviatura: string;
 }
 
 interface Verse {
@@ -20,9 +20,12 @@ interface Verse {
 }
 
 interface Commentary {
-  versiculo_inicio: number;
+  tipo_comentario: string;
+  autor: string;
+  titulo: string | null;
+  contenido: string;
+  versiculo_inicio: number | null;
   versiculo_fin: number | null;
-  texto_comentario: string;
 }
 
 export function useBibleBooks() {
@@ -48,7 +51,7 @@ export function useBibleVersions() {
     if (loading) return [];
     
     return query<Version>(`
-      SELECT codigo, nombre, abreviatura
+      SELECT id, codigo, nombre
       FROM versiones
       ORDER BY nombre
     `);
@@ -64,38 +67,32 @@ export function useBibleChapter(bookCode: string, chapterNum: number, versionCod
     if (loading) return [];
     
     return query<Verse>(`
-      SELECT 
-        numero_versiculo,
-        texto
-      FROM versiculos
-      WHERE codigo_libro = ?
+      SELECT numero_versiculo, texto
+      FROM vista_versiculos_completa
+      WHERE version_codigo = ?
+        AND libro_codigo = ?
         AND numero_capitulo = ?
-        AND codigo_version = ?
       ORDER BY numero_versiculo
-    `, [bookCode, chapterNum, versionCode]);
+    `, [versionCode, bookCode, chapterNum]);
   }, [bookCode, chapterNum, versionCode, query, loading]);
 
   return { verses, loading };
 }
 
-export function useBibleCommentary(bookCode: string, chapterNum: number, commentaryType: string) {
+export function useBibleCommentary(bookCode: string, chapterNum: number) {
   const { query, loading } = useSqliteDb();
 
   const commentary = useMemo(() => {
     if (loading) return [];
     
     return query<Commentary>(`
-      SELECT 
-        versiculo_inicio,
-        versiculo_fin,
-        texto_comentario
-      FROM comentarios
-      WHERE codigo_libro = ?
+      SELECT tipo_comentario, autor, titulo, contenido, versiculo_inicio, versiculo_fin
+      FROM vista_comentarios_completa
+      WHERE libro_codigo = ?
         AND numero_capitulo = ?
-        AND tipo_comentario = ?
-      ORDER BY versiculo_inicio
-    `, [bookCode, chapterNum, commentaryType]);
-  }, [bookCode, chapterNum, commentaryType, query, loading]);
+      ORDER BY id
+    `, [bookCode, chapterNum]);
+  }, [bookCode, chapterNum, query, loading]);
 
   return { commentary, loading };
 }

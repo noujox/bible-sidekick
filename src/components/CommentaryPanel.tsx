@@ -1,12 +1,4 @@
 import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { useState } from "react";
 import { useBibleCommentary, useBibleBooks } from "@/hooks/use-bible-data";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -25,8 +17,7 @@ const COMMENTARIES = [
 ];
 
 export function CommentaryPanel({ book, chapter, fontSize = "medium", fontFamily = "serif" }: CommentaryPanelProps) {
-  const [commentary, setCommentary] = useState("matthew-henry");
-  const { commentary: commentaryData, loading } = useBibleCommentary(book, parseInt(chapter), commentary);
+  const { commentary: commentaryData, loading } = useBibleCommentary(book, parseInt(chapter));
   const { books } = useBibleBooks();
 
   const bookData = books.find((b) => b.codigo === book);
@@ -50,18 +41,6 @@ export function CommentaryPanel({ book, chapter, fontSize = "medium", fontFamily
       <div className="p-4 border-b border-border">
         <h2 className="text-lg font-semibold mb-3">Comentarios Bíblicos</h2>
         <p className="text-sm text-muted-foreground mb-3">{bookName} {chapter}</p>
-        <Select value={commentary} onValueChange={setCommentary}>
-          <SelectTrigger className="w-full bg-secondary border-border">
-            <SelectValue placeholder="Seleccionar comentario" />
-          </SelectTrigger>
-          <SelectContent className="bg-popover border-border">
-            {COMMENTARIES.map((c) => (
-              <SelectItem key={c.value} value={c.value}>
-                {c.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
       </div>
 
       <ScrollArea className="flex-1 p-6">
@@ -82,14 +61,23 @@ export function CommentaryPanel({ book, chapter, fontSize = "medium", fontFamily
               No hay comentarios disponibles para este capítulo en la versión seleccionada.
             </div>
           ) : (
-            <div className={`prose prose-invert prose-sm max-w-none space-y-4 text-foreground leading-relaxed ${sizeClasses[fontSize as keyof typeof sizeClasses]} ${fontClasses[fontFamily as keyof typeof fontClasses]}`}>
+            <div className={`prose prose-invert prose-sm max-w-none space-y-6 text-foreground leading-relaxed ${sizeClasses[fontSize as keyof typeof sizeClasses]} ${fontClasses[fontFamily as keyof typeof fontClasses]}`}>
               {commentaryData.map((item, i) => (
-                <div key={i} className="space-y-2">
-                  <h4 className="bible-heading text-base mt-6 mb-3">
-                    Versículo{item.versiculo_fin ? `s ${item.versiculo_inicio}-${item.versiculo_fin}` : ` ${item.versiculo_inicio}`}
-                  </h4>
+                <div key={i} className="space-y-2 border-l-2 border-primary/30 pl-4">
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <span className="font-semibold text-primary">{item.tipo_comentario}</span>
+                    {item.autor && <span>• {item.autor}</span>}
+                    {item.versiculo_inicio && (
+                      <span>• v.{item.versiculo_inicio}{item.versiculo_fin ? `-${item.versiculo_fin}` : ''}</span>
+                    )}
+                  </div>
+                  {item.titulo && (
+                    <h4 className="bible-heading text-base font-semibold mt-2">
+                      {item.titulo}
+                    </h4>
+                  )}
                   <p className="text-foreground whitespace-pre-wrap">
-                    {item.texto_comentario}
+                    {item.contenido}
                   </p>
                 </div>
               ))}

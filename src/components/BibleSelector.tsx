@@ -51,7 +51,7 @@ export function BibleSelector({
 
   const versionsData = versions.map((v) => ({
     value: v.codigo,
-    label: v.abreviatura || v.nombre,
+    label: v.nombre,
   }));
 
   const selectedBook = booksData.find((b) => b.value === book);
