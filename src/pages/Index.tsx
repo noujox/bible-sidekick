@@ -29,15 +29,22 @@ import { useSqliteDb } from "@/hooks/use-sqlite-db";
 const Index = () => {
   const isMobile = useIsMobile();
   const { loading, progress, fromCache } = useSqliteDb();
-  const [book, setBook] = useState("john");
-  const [chapter, setChapter] = useState("1");
-  const [version, setVersion] = useState("rvr1960");
+  const [book, setBook] = useState(() => localStorage.getItem("bible-book") || "gen");
+  const [chapter, setChapter] = useState(() => localStorage.getItem("bible-chapter") || "1");
+  const [version, setVersion] = useState(() => localStorage.getItem("bible-version") || "rvr1960");
   const [showCommentary, setShowCommentary] = useState(true);
   const [fontSize, setFontSize] = useState("medium");
   const [fontFamily, setFontFamily] = useState("serif");
   const [mobileView, setMobileView] = useState<"bible" | "commentary">("bible");
   const [showNavButtons, setShowNavButtons] = useState(true);
   const hideTimerRef = useRef<NodeJS.Timeout | null>(null);
+  
+  // Save to localStorage when book, chapter, or version changes
+  useEffect(() => {
+    localStorage.setItem("bible-book", book);
+    localStorage.setItem("bible-chapter", chapter);
+    localStorage.setItem("bible-version", version);
+  }, [book, chapter, version]);
   
   useEffect(() => {
     const resetTimer = () => {
