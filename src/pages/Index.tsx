@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+  import { useState, useEffect, useRef } from "react";
 import { BibleSelector } from "@/components/BibleSelector";
 import { BibleText } from "@/components/BibleText";
 import { CommentaryPanel } from "@/components/CommentaryPanel";
@@ -29,9 +29,9 @@ import { useSqliteDb } from "@/hooks/use-sqlite-db";
 const Index = () => {
   const isMobile = useIsMobile();
   const { loading, progress, fromCache } = useSqliteDb();
-  const [book, setBook] = useState(() => localStorage.getItem("bible-book") || "gen");
+  const [book, setBook] = useState(() => localStorage.getItem("bible-book") || "genesis");
   const [chapter, setChapter] = useState(() => localStorage.getItem("bible-chapter") || "1");
-  const [version, setVersion] = useState(() => localStorage.getItem("bible-version") || "rvr1960");
+  const [version, setVersion] = useState(() => localStorage.getItem("bible-version") || "RV1960");
   const [showCommentary, setShowCommentary] = useState(true);
   const [fontSize, setFontSize] = useState("medium");
   const [fontFamily, setFontFamily] = useState("serif");
