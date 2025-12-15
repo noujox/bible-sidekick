@@ -44,11 +44,11 @@ export function CommentaryPanel({ book, chapter, fontSize = "medium", fontFamily
       </div>
 
       <ScrollArea className="flex-1 p-6">
-        <div className="max-w-2xl">
+        <div className="max-w-2xl pb-[40vh]">
           <h3 className="text-xl font-semibold mb-4 text-heading">
             Comentario Bíblico
           </h3>
-          
+
           {loading ? (
             <div className="space-y-4">
               <Skeleton className="h-6 w-full" />
