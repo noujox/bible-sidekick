@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import initSqlJs, { Database } from "sql.js";
+import sqlWasmUrl from "sql.js/dist/sql-wasm.wasm?url";
 import { getCachedDB, saveToCache } from "@/lib/db-cache";
 import { DB_URL } from "@/config/db-version";
 
@@ -28,7 +29,7 @@ export function useSqliteDb() {
         console.log("✓ Cargando DB desde caché local");
         setFromCache(true);
         const SQL = await initSqlJs({
-          locateFile: (file) => `https://sql.js.org/dist/${file}`,
+          locateFile: () => sqlWasmUrl,
         });
         const database = new SQL.Database(cached);
         setDb(database);
@@ -84,7 +85,7 @@ export function useSqliteDb() {
 
       // 4. Inicializar sql.js
       const SQL = await initSqlJs({
-        locateFile: (file) => `https://sql.js.org/dist/${file}`,
+        locateFile: () => sqlWasmUrl,
       });
 
       const database = new SQL.Database(dbBuffer);
