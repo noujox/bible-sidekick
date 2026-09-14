@@ -1,0 +1,84 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    name: Build and publish image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      release_tag: ${{ steps.release.outputs.release_tag }}
+      short_sha: ${{ steps.release.outputs.short_sha }}
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v6
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Validate release tag
+        id: release
+        shell: bash
+        run: |
+          if [[ ! "${GITHUB_REF_NAME}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Release tags must use the vX.Y.Z format." >&2
+            exit 1
+          fi
+          echo "release_tag=${GITHUB_REF_NAME}" >> "${GITHUB_OUTPUT}"
+          echo "short_sha=${GITHUB_SHA::7}" >> "${GITHUB_OUTPUT}"
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Lint
+        run: bun run lint
+
+      - name: Build
+        run: bun run build
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ghcr.io/noujox/bible-sidekick:${{ steps.release.outputs.release_tag }}
+            ghcr.io/noujox/bible-sidekick:latest
+            ghcr.io/noujox/bible-sidekick:${{ steps.release.outputs.short_sha }}
+
+  deploy:
+    name: Deploy through Portainer
+    needs: build
+    runs-on: [self-hosted, linux, bible-sidekick-deploy]
+    permissions:
+      contents: read
+    environment: production
+    steps:
+      - name: Check out deployment artifacts
+        uses: actions/checkout@v6
+        with:
+          sparse-checkout: |
+            deploy
+          sparse-checkout-cone-mode: false
+
+      - name: Update Portainer stack and verify health
+        env:
+          # Portainer credentials are configured on the local self-hosted runner.
+          DEPLOY_IMAGE_TAG: ${{ needs.build.outputs.release_tag }}
+          PORTAINER_STACK_ID: '61'
+          PORTAINER_ENDPOINT_ID: '2'
+          DEPLOY_HEALTH_URL: https://biblia.darkosa.cl
+        run: python3 deploy/deploy_portainer.py

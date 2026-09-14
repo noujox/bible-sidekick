@@ -1,0 +1,18 @@
+version: '3.8'
+
+networks:
+  proxylan:
+    external: true
+    name: proxylan
+
+services:
+  bible-app:
+    image: ghcr.io/noujox/bible-sidekick:__IMAGE_TAG__
+    restart: always
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - proxylan

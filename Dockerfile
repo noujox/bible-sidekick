@@ -6,8 +6,8 @@ WORKDIR /app
 # Copiar los archivos de dependencias
 COPY package.json bun.lockb ./
 
-# Instalar dependencias
-RUN bun install
+# Instalar dependencias de forma reproducible
+RUN bun install --frozen-lockfile
 
 # Copiar el resto del código fuente
 COPY . .
@@ -26,6 +26,9 @@ COPY --from=builder /app/dist /usr/share/nginx/html
 
 # Exponer el puerto 80
 EXPOSE 80
+
+# Verificar que Nginx responde antes de marcar el contenedor como saludable
+HEALTHCHECK --interval=30s --timeout=10s --retries=3 CMD ["wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1:80"]
 
 # Comando para iniciar nginx
 CMD ["nginx", "-g", "daemon off;"]
