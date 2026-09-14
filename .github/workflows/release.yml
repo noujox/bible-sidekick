@@ -78,7 +78,10 @@ jobs:
         env:
           DEPLOY_IMAGE_TAG: ${{ needs.build.outputs.release_tag }}
         run: |
+          token="$(curl --fail --silent 'https://ghcr.io/token?service=ghcr.io&scope=repository:noujox/bible-sidekick:pull' | jq --raw-output '.token')"
+          test -n "${token}" && test "${token}" != "null"
           curl --fail --silent --show-error --location \
+            -H "Authorization: Bearer ${token}" \
             -H 'Accept: application/vnd.oci.image.index.v1+json, application/vnd.oci.image.manifest.v1+json' \
             "https://ghcr.io/v2/noujox/bible-sidekick/manifests/${DEPLOY_IMAGE_TAG}" \
             --output /dev/null
