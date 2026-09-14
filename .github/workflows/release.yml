@@ -74,6 +74,15 @@ jobs:
             deploy
           sparse-checkout-cone-mode: false
 
+      - name: Verify image is publicly pullable
+        env:
+          DEPLOY_IMAGE_TAG: ${{ needs.build.outputs.release_tag }}
+        run: |
+          curl --fail --silent --show-error --location \
+            -H 'Accept: application/vnd.oci.image.index.v1+json, application/vnd.oci.image.manifest.v1+json' \
+            "https://ghcr.io/v2/noujox/bible-sidekick/manifests/${DEPLOY_IMAGE_TAG}" \
+            --output /dev/null
+
       - name: Update Portainer stack and verify health
         env:
           # Portainer credentials are configured on the local self-hosted runner.
