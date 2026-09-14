@@ -3,6 +3,8 @@ import initSqlJs, { Database } from "sql.js";
 import { getCachedDB, saveToCache } from "@/lib/db-cache";
 import { DB_URL } from "@/config/db-version";
 
+type SqliteParameter = string | number | Uint8Array | null;
+
 export function useSqliteDb() {
   const [db, setDb] = useState<Database | null>(null);
   const [loading, setLoading] = useState(true);
@@ -96,7 +98,7 @@ export function useSqliteDb() {
     }
   };
 
-  const query = <T = any>(sql: string, params: any[] = []): T[] => {
+  const query = <T = Record<string, unknown>>(sql: string, params: SqliteParameter[] = []): T[] => {
     if (!db) return [];
     
     try {
@@ -107,7 +109,7 @@ export function useSqliteDb() {
       const { columns, values } = results[0];
       
       return values.map((row) => {
-        const obj: any = {};
+        const obj: Record<string, unknown> = {};
         columns.forEach((col, index) => {
           obj[col] = row[index];
         });
