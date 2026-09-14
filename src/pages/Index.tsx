@@ -26,6 +26,14 @@ import {
 } from "@/components/ui/resizable";
 import { useSqliteDb } from "@/hooks/use-sqlite-db";
 
+const NAV_BUTTON_HIDE_DELAY_MS = 3000;
+const NAV_BUTTON_SCROLL_THRESHOLDS = {
+  up: 24,
+  down: 320,
+} as const;
+
+type ScrollDirection = keyof typeof NAV_BUTTON_SCROLL_THRESHOLDS;
+
 const Index = () => {
   const isMobile = useIsMobile();
   const { loading, progress, fromCache } = useSqliteDb();
@@ -47,6 +55,24 @@ const Index = () => {
   }, [book, chapter, version]);
   
   useEffect(() => {
+    const scrollStates = new Map<EventTarget, {
+      position: number;
+      direction: ScrollDirection | null;
+      distance: number;
+    }>();
+
+    const getScrollPosition = (target: EventTarget) => {
+      if (target === window || target === document) {
+        return window.scrollY;
+      }
+
+      if (target instanceof HTMLElement) {
+        return target.scrollTop;
+      }
+
+      return null;
+    };
+
     const resetTimer = () => {
       setShowNavButtons(true);
       if (hideTimerRef.current) {
@@ -54,11 +80,45 @@ const Index = () => {
       }
       hideTimerRef.current = setTimeout(() => {
         setShowNavButtons(false);
-      }, 3000);
+      }, NAV_BUTTON_HIDE_DELAY_MS);
     };
 
-    const handleScroll = () => {
-      resetTimer();
+    const handleScroll = (event: Event) => {
+      const target = event.target ?? window;
+      const currentPosition = getScrollPosition(target);
+
+      if (currentPosition === null) {
+        return;
+      }
+
+      const previousState = scrollStates.get(target);
+      if (!previousState) {
+        scrollStates.set(target, {
+          position: currentPosition,
+          direction: null,
+          distance: 0,
+        });
+        return;
+      }
+
+      const delta = currentPosition - previousState.position;
+      previousState.position = currentPosition;
+
+      if (delta === 0) {
+        return;
+      }
+
+      const direction: ScrollDirection = delta < 0 ? "up" : "down";
+      if (previousState.direction !== direction) {
+        previousState.direction = direction;
+        previousState.distance = 0;
+      }
+
+      previousState.distance += Math.abs(delta);
+      if (previousState.distance >= NAV_BUTTON_SCROLL_THRESHOLDS[direction]) {
+        previousState.distance = 0;
+        resetTimer();
+      }
     };
 
     resetTimer();
@@ -69,6 +129,7 @@ const Index = () => {
       if (hideTimerRef.current) {
         clearTimeout(hideTimerRef.current);
       }
+      scrollStates.clear();
     };
   }, []);
   
