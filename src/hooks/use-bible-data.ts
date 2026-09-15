@@ -20,12 +20,25 @@ interface Verse {
 }
 
 export interface Commentary {
+  id: number;
+  capitulo_id: number;
+  capitulo_fin_id: number | null;
+  tipo_comentario_id: number;
+  tipo_comentario_codigo: string;
   tipo_comentario: string;
-  autor: string;
+  autor: string | null;
   titulo: string | null;
   contenido: string;
+  contenido_html: string | null;
   versiculo_inicio: number | null;
   versiculo_fin: number | null;
+  referencia_original: string | null;
+  es_general: 0 | 1;
+  orden: number | null;
+  fecha_scrapeado: string | null;
+  libro_codigo: string;
+  libro_nombre: string;
+  numero_capitulo: number;
 }
 
 export function useBibleBooks() {
@@ -86,11 +99,33 @@ export function useBibleCommentary(bookCode: string, chapterNum: number, enabled
     if (loading || !enabled) return [];
     
     return query<Commentary>(`
-      SELECT tipo_comentario, autor, titulo, contenido, versiculo_inicio, versiculo_fin
-      FROM vista_comentarios_completa
-      WHERE libro_codigo = ?
-        AND numero_capitulo = ?
-      ORDER BY id
+      SELECT
+        com.id,
+        com.capitulo_id,
+        com.capitulo_fin_id,
+        com.tipo_comentario_id,
+        tipo.codigo AS tipo_comentario_codigo,
+        tipo.nombre AS tipo_comentario,
+        tipo.autor,
+        com.titulo,
+        com.contenido,
+        com.contenido_html,
+        com.versiculo_inicio,
+        com.versiculo_fin,
+        com.referencia_original,
+        com.es_general,
+        com.orden,
+        com.fecha_scrapeado,
+        lib.codigo AS libro_codigo,
+        lib.nombre AS libro_nombre,
+        cap.numero_capitulo
+      FROM comentarios AS com
+      INNER JOIN capitulos AS cap ON cap.id = com.capitulo_id
+      INNER JOIN libros AS lib ON lib.id = cap.libro_id
+      INNER JOIN tipos_comentario AS tipo ON tipo.id = com.tipo_comentario_id
+      WHERE lib.codigo = ?
+        AND cap.numero_capitulo = ?
+      ORDER BY com.orden, com.id
     `, [bookCode, chapterNum]);
   }, [bookCode, chapterNum, query, loading, enabled]);
 

@@ -1,7 +1,6 @@
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useBibleCommentary, useBibleBooks } from "@/hooks/use-bible-data";
 import { Skeleton } from "@/components/ui/skeleton";
-import { parseCommentary } from "@/lib/commentary-parser";
 
 interface CommentaryPanelProps {
   book: string;
@@ -9,13 +8,6 @@ interface CommentaryPanelProps {
   fontSize?: string;
   fontFamily?: string;
 }
-
-const COMMENTARIES = [
-  { value: "matthew-henry", label: "Matthew Henry" },
-  { value: "jamieson", label: "Jamieson-Fausset-Brown" },
-  { value: "barnes", label: "Barnes' Notes" },
-  { value: "gill", label: "Gill's Exposition" },
-];
 
 export function CommentaryPanel({ book, chapter, fontSize = "medium", fontFamily = "serif" }: CommentaryPanelProps) {
   const { commentary: commentaryData, loading } = useBibleCommentary(book, parseInt(chapter));
@@ -63,38 +55,21 @@ export function CommentaryPanel({ book, chapter, fontSize = "medium", fontFamily
             </div>
           ) : (
             <div className={`prose prose-invert prose-sm max-w-none space-y-6 text-foreground leading-relaxed ${sizeClasses[fontSize as keyof typeof sizeClasses]} ${fontClasses[fontFamily as keyof typeof fontClasses]}`}>
-              {commentaryData.map((item, i) => (
-                <div key={i} className="space-y-2 border-l-2 border-primary/30 pl-4">
+              {commentaryData.map((item) => (
+                <article key={item.id} className="space-y-2 border-l-2 border-primary/30 pl-4">
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
                     <span className="font-semibold text-primary">{item.tipo_comentario}</span>
                     {item.autor && <span>• {item.autor}</span>}
-                    {item.versiculo_inicio && (
-                      <span>• v.{item.versiculo_inicio}{item.versiculo_fin ? `-${item.versiculo_fin}` : ''}</span>
-                    )}
+                    {item.referencia_original && <span>• {item.referencia_original}</span>}
+                    {item.es_general === 1 && <span>• General</span>}
                   </div>
                   {item.titulo && (
                     <h4 className="bible-heading text-base font-semibold mt-2">
                       {item.titulo}
                     </h4>
                   )}
-                  {parseCommentary(item.contenido).map((section, sectionIndex) => (
-                    <div key={`${i}-${sectionIndex}`} className="space-y-2">
-                      {section.reference && (
-                        <h4 className="text-sm font-semibold text-primary">
-                          {section.reference}
-                        </h4>
-                      )}
-                      {section.paragraphs.map((paragraph, paragraphIndex) => (
-                        <p
-                          key={`${i}-${sectionIndex}-${paragraphIndex}`}
-                          className="text-foreground whitespace-pre-wrap"
-                        >
-                          {paragraph}
-                        </p>
-                      ))}
-                    </div>
-                  ))}
-                </div>
+                  <p className="text-foreground whitespace-pre-wrap">{item.contenido}</p>
+                </article>
               ))}
             </div>
           )}

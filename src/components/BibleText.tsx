@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { MessageCircle } from "lucide-react";
 import {
   useBibleChapter,
@@ -14,7 +14,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { associateCommentariesWithVerses, parseCommentary } from "@/lib/commentary-parser";
 
 interface BibleTextProps {
   book: string;
@@ -55,11 +54,19 @@ export function BibleText({
     mono: "font-mono",
   };
 
-  const commentaryByVerse = associateCommentariesWithVerses<Commentary>(
-    verses,
-    commentaryData,
-    chapterNumber,
-  );
+  const commentaryByVerse = useMemo(() => {
+    const grouped = new Map<number, Commentary[]>();
+
+    for (const commentary of commentaryData) {
+      if (commentary.es_general !== 0 || commentary.versiculo_inicio === null) continue;
+
+      const entries = grouped.get(commentary.versiculo_inicio) ?? [];
+      entries.push(commentary);
+      grouped.set(commentary.versiculo_inicio, entries);
+    }
+
+    return grouped;
+  }, [commentaryData]);
 
   useEffect(() => {
     setSelectedVerse(null);
@@ -152,39 +159,19 @@ export function BibleText({
             </DialogHeader>
 
             <div className={`prose prose-invert prose-sm max-w-none space-y-6 text-foreground leading-relaxed ${sizeClasses[fontSize as keyof typeof sizeClasses]} ${fontClasses[fontFamily as keyof typeof fontClasses]}`}>
-              {selectedCommentaries.map((item, index) => (
-                <article key={`${item.tipo_comentario}-${item.autor}-${index}`} className="space-y-2 border-l-2 border-primary/30 pl-4">
+              {selectedCommentaries.map((item) => (
+                <article key={item.id} className="space-y-2 border-l-2 border-primary/30 pl-4">
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
                     <span className="font-semibold text-primary">{item.tipo_comentario}</span>
                     {item.autor && <span>• {item.autor}</span>}
-                    {item.versiculo_inicio && (
-                      <span>
-                        • v.{item.versiculo_inicio}{item.versiculo_fin ? `-${item.versiculo_fin}` : ""}
-                      </span>
-                    )}
+                    {item.referencia_original && <span>• {item.referencia_original}</span>}
                   </div>
                   {item.titulo && (
                     <h3 className="bible-heading text-base font-semibold mt-2">
                       {item.titulo}
                     </h3>
                   )}
-                  {parseCommentary(item.contenido).map((section, sectionIndex) => (
-                    <div key={`${index}-${sectionIndex}`} className="space-y-2">
-                      {section.reference && (
-                        <h4 className="text-sm font-semibold text-primary">
-                          {section.reference}
-                        </h4>
-                      )}
-                      {section.paragraphs.map((paragraph, paragraphIndex) => (
-                        <p
-                          key={`${index}-${sectionIndex}-${paragraphIndex}`}
-                          className="text-foreground whitespace-pre-wrap"
-                        >
-                          {paragraph}
-                        </p>
-                      ))}
-                    </div>
-                  ))}
+                  <p className="text-foreground whitespace-pre-wrap">{item.contenido}</p>
                 </article>
               ))}
             </div>
