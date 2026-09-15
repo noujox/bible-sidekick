@@ -254,6 +254,7 @@ const Index = () => {
                 version={version}
                 fontSize={fontSize}
                 fontFamily={fontFamily}
+                isMobile={isMobile}
               />
             ) : (
               <CommentaryPanel 
@@ -314,6 +315,7 @@ const Index = () => {
             version={version}
             fontSize={fontSize}
             fontFamily={fontFamily}
+            isMobile={isMobile}
           />
         )}
       </div>

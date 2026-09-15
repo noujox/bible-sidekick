@@ -19,7 +19,7 @@ interface Verse {
   texto: string;
 }
 
-interface Commentary {
+export interface Commentary {
   tipo_comentario: string;
   autor: string;
   titulo: string | null;
@@ -79,11 +79,11 @@ export function useBibleChapter(bookCode: string, chapterNum: number, versionCod
   return { verses, loading };
 }
 
-export function useBibleCommentary(bookCode: string, chapterNum: number) {
+export function useBibleCommentary(bookCode: string, chapterNum: number, enabled = true) {
   const { query, loading } = useSqliteDb();
 
   const commentary = useMemo(() => {
-    if (loading) return [];
+    if (loading || !enabled) return [];
     
     return query<Commentary>(`
       SELECT tipo_comentario, autor, titulo, contenido, versiculo_inicio, versiculo_fin
@@ -92,7 +92,7 @@ export function useBibleCommentary(bookCode: string, chapterNum: number) {
         AND numero_capitulo = ?
       ORDER BY id
     `, [bookCode, chapterNum]);
-  }, [bookCode, chapterNum, query, loading]);
+  }, [bookCode, chapterNum, query, loading, enabled]);
 
   return { commentary, loading };
 }
