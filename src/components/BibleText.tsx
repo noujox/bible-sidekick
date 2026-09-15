@@ -38,6 +38,7 @@ export function BibleText({
   const { books } = useBibleBooks();
   const [selectedVerse, setSelectedVerse] = useState<number | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const pendingScrollTopRef = useRef<number | null>(null);
 
   const bookData = books.find((b) => b.codigo === book);
   const bookName = bookData?.nombre || book.toUpperCase();
@@ -70,14 +71,13 @@ export function BibleText({
   }, [commentaryData]);
 
   useEffect(() => {
-    if (!isMobile || loading || typeof window === "undefined") return;
+    if (loading || typeof window === "undefined") return;
 
     const container = scrollContainerRef.current;
     if (!container) return;
 
     const storageKey = `bible-sidekick:bible-scroll:${encodeURIComponent(version)}:${encodeURIComponent(book)}:${encodeURIComponent(chapter)}`;
-    let frameId: number | null = null;
-    let pendingScrollTop: number | null = null;
+    let lastSavedScrollTop = container.scrollTop;
 
     try {
       const savedScrollTop = window.localStorage.getItem(storageKey);
@@ -92,44 +92,51 @@ export function BibleText({
       // localStorage may be unavailable in private browsing or restricted contexts.
     }
 
-    const flushPendingScroll = () => {
-      if (pendingScrollTop === null) return;
+    pendingScrollTopRef.current = container.scrollTop;
+    lastSavedScrollTop = container.scrollTop;
 
-      const scrollTop = pendingScrollTop;
-      pendingScrollTop = null;
+    const persistScroll = () => {
+      const scrollTop = pendingScrollTopRef.current ?? container.scrollTop;
+      pendingScrollTopRef.current = null;
+      if (!Number.isFinite(scrollTop)) return;
 
-      if (frameId !== null) {
-        window.cancelAnimationFrame(frameId);
-        frameId = null;
-      }
+      const maxScrollTop = Math.max(0, container.scrollHeight - container.clientHeight);
+      const clampedScrollTop = Math.min(Math.max(scrollTop, 0), maxScrollTop);
+      if (clampedScrollTop === lastSavedScrollTop) return;
 
       try {
-        window.localStorage.setItem(storageKey, String(scrollTop));
+        window.localStorage.setItem(storageKey, String(clampedScrollTop));
+        lastSavedScrollTop = clampedScrollTop;
       } catch {
         // Ignore storage failures so scrolling remains functional.
       }
     };
 
     const handleScroll = () => {
-      pendingScrollTop = container.scrollTop;
-      if (frameId !== null) return;
+      pendingScrollTopRef.current = container.scrollTop;
+    };
 
-      frameId = window.requestAnimationFrame(flushPendingScroll);
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "hidden") persistScroll();
     };
 
     const handlePageHide = () => {
-      flushPendingScroll();
+      persistScroll();
     };
 
+    const backupIntervalId = window.setInterval(persistScroll, 5000);
     container.addEventListener("scroll", handleScroll, { passive: true });
+    document.addEventListener("visibilitychange", handleVisibilityChange);
     window.addEventListener("pagehide", handlePageHide);
 
     return () => {
+      window.clearInterval(backupIntervalId);
       container.removeEventListener("scroll", handleScroll);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
       window.removeEventListener("pagehide", handlePageHide);
-      flushPendingScroll();
+      persistScroll();
     };
-  }, [book, chapter, version, isMobile, loading]);
+  }, [book, chapter, version, loading]);
 
   useEffect(() => {
     setSelectedVerse(null);
