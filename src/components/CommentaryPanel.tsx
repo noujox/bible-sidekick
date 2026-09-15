@@ -1,6 +1,7 @@
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useBibleCommentary, useBibleBooks } from "@/hooks/use-bible-data";
 import { Skeleton } from "@/components/ui/skeleton";
+import { parseCommentary } from "@/lib/commentary-parser";
 
 interface CommentaryPanelProps {
   book: string;
@@ -76,9 +77,23 @@ export function CommentaryPanel({ book, chapter, fontSize = "medium", fontFamily
                       {item.titulo}
                     </h4>
                   )}
-                  <p className="text-foreground whitespace-pre-wrap">
-                    {item.contenido}
-                  </p>
+                  {parseCommentary(item.contenido).map((section, sectionIndex) => (
+                    <div key={`${i}-${sectionIndex}`} className="space-y-2">
+                      {section.reference && (
+                        <h4 className="text-sm font-semibold text-primary">
+                          {section.reference}
+                        </h4>
+                      )}
+                      {section.paragraphs.map((paragraph, paragraphIndex) => (
+                        <p
+                          key={`${i}-${sectionIndex}-${paragraphIndex}`}
+                          className="text-foreground whitespace-pre-wrap"
+                        >
+                          {paragraph}
+                        </p>
+                      ))}
+                    </div>
+                  ))}
                 </div>
               ))}
             </div>
