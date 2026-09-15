@@ -224,29 +224,52 @@ const Index = () => {
       {/* Main Content */}
       <div className="flex-1 overflow-hidden relative">
         {/* Floating Navigation Buttons */}
-        <Button
-          variant="ghost"
-          size="icon"
-          className={`fixed top-1/2 -translate-y-1/2 z-50 hover:bg-accent rounded-full h-12 w-12 shadow-lg bg-card/80 backdrop-blur-sm transition-all duration-300 ${
-            showNavButtons ? 'left-4 opacity-100' : '-left-12 opacity-0'
-          }`}
-          onClick={handlePrevious}
-        >
-          <ChevronLeft className="h-6 w-6" />
-        </Button>
+        <div className="fixed inset-x-0 top-0 z-50 h-svh pointer-events-none">
+          <Button
+            variant="ghost"
+            size="icon"
+            className={`absolute top-1/2 -translate-y-1/2 pointer-events-auto hover:bg-accent rounded-full h-12 w-12 shadow-lg bg-card/80 backdrop-blur-sm transition-[left,opacity] duration-300 ${
+              showNavButtons ? 'left-4 opacity-100' : '-left-12 opacity-0'
+            }`}
+            onClick={handlePrevious}
+          >
+            <ChevronLeft className="h-6 w-6" />
+          </Button>
 
-        <Button
-          variant="ghost"
-          size="icon"
-          className={`fixed top-1/2 -translate-y-1/2 z-50 hover:bg-accent rounded-full h-12 w-12 shadow-lg bg-card/80 backdrop-blur-sm transition-all duration-300 ${
-            showNavButtons ? 'right-4 opacity-100' : '-right-12 opacity-0'
-          }`}
-          onClick={handleNext}
-        >
-          <ChevronRight className="h-6 w-6" />
-        </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className={`absolute top-1/2 -translate-y-1/2 pointer-events-auto hover:bg-accent rounded-full h-12 w-12 shadow-lg bg-card/80 backdrop-blur-sm transition-[right,opacity] duration-300 ${
+              showNavButtons ? 'right-4 opacity-100' : '-right-12 opacity-0'
+            }`}
+            onClick={handleNext}
+          >
+            <ChevronRight className="h-6 w-6" />
+          </Button>
 
-{isMobile ? (
+          {isMobile && (
+            <Button
+              variant="default"
+              size="lg"
+              className="absolute bottom-[calc(1rem+env(safe-area-inset-bottom))] left-1/2 -translate-x-1/2 pointer-events-auto shadow-lg gap-2"
+              onClick={() => setMobileView(mobileView === "bible" ? "commentary" : "bible")}
+            >
+              {mobileView === "bible" ? (
+                <>
+                  <FileText className="h-5 w-5" />
+                  Ver Comentarios
+                </>
+              ) : (
+                <>
+                  <BookOpen className="h-5 w-5" />
+                  Ver Biblia
+                </>
+              )}
+            </Button>
+          )}
+        </div>
+
+        {isMobile ? (
           <>
             {mobileView === "bible" ? (
               <BibleText
@@ -267,26 +290,6 @@ const Index = () => {
                 fontFamily={fontFamily}
               />
             )}
-            
-            {/* Mobile toggle button */}
-            <Button
-              variant="default"
-              size="lg"
-              className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 shadow-lg gap-2"
-              onClick={() => setMobileView(mobileView === "bible" ? "commentary" : "bible")}
-            >
-              {mobileView === "bible" ? (
-                <>
-                  <FileText className="h-5 w-5" />
-                  Ver Comentarios
-                </>
-              ) : (
-                <>
-                  <BookOpen className="h-5 w-5" />
-                  Ver Biblia
-                </>
-              )}
-            </Button>
           </>
         ) : showCommentary ? (
           <ResizablePanelGroup direction="horizontal" className="h-full">
