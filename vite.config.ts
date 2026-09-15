@@ -43,11 +43,15 @@ export default defineConfig(({ mode }) => ({
         // Usar runtime caching para la base de datos
         runtimeCaching: [
           {
-            urlPattern: /\/biblia\.db$/,
-            handler: 'CacheFirst',
+            urlPattern: /\/biblia\.db(?:\?.*)?$/,
+            handler: 'NetworkFirst',
             options: {
               cacheName: 'bible-db-cache',
+              matchOptions: {
+                ignoreSearch: true,
+              },
               expiration: {
+                maxEntries: 2,
                 maxAgeSeconds: 365 * 24 * 60 * 60, // 1 año
               },
               cacheableResponse: {

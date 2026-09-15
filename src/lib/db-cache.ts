@@ -25,7 +25,7 @@ export async function openIndexedDB(): Promise<IDBDatabase> {
   });
 }
 
-export async function getCachedDB(): Promise<Uint8Array | null> {
+export async function getCachedDB(): Promise<CachedDB | null> {
   try {
     const db = await openIndexedDB();
     const transaction = db.transaction([DB_STORE_NAME], "readonly");
@@ -46,14 +46,7 @@ export async function getCachedDB(): Promise<Uint8Array | null> {
 
     db.close();
 
-    // Verificar versión
-    if (version !== DB_VERSION) {
-      console.log("Nueva versión de DB disponible, limpiando caché...");
-      await clearCache();
-      return null;
-    }
-
-    return data || null;
+    return data && typeof version === "string" ? { version, data } : null;
   } catch (error) {
     console.error("Error al recuperar DB del caché:", error);
     return null;
@@ -78,27 +71,6 @@ export async function saveToCache(data: Uint8Array): Promise<void> {
     console.log("DB guardada en caché exitosamente");
   } catch (error) {
     console.error("Error al guardar DB en caché:", error);
-    throw error;
-  }
-}
-
-export async function clearCache(): Promise<void> {
-  try {
-    const db = await openIndexedDB();
-    const transaction = db.transaction([DB_STORE_NAME], "readwrite");
-    const store = transaction.objectStore(DB_STORE_NAME);
-
-    store.clear();
-
-    await new Promise<void>((resolve, reject) => {
-      transaction.oncomplete = () => resolve();
-      transaction.onerror = () => reject(transaction.error);
-    });
-
-    db.close();
-    console.log("Caché limpiado exitosamente");
-  } catch (error) {
-    console.error("Error al limpiar caché:", error);
     throw error;
   }
 }
