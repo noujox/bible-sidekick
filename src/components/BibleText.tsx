@@ -150,7 +150,10 @@ export function BibleText({
             if (!open) setSelectedVerse(null);
           }}
         >
-          <DialogContent className="w-[calc(100%-2rem)] max-h-[85vh] overflow-y-auto p-5">
+          <DialogContent
+            className="w-[calc(100%-2rem)] max-h-[85vh] overflow-y-auto p-5"
+            onClick={() => setSelectedVerse(null)}
+          >
             <DialogHeader className="pr-6 text-left">
               <DialogTitle>Comentarios del versículo {selectedVerse}</DialogTitle>
               <DialogDescription>
