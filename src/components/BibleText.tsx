@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { MessageCircle } from "lucide-react";
 import {
   useBibleChapter,
@@ -37,6 +37,7 @@ export function BibleText({
   const { commentary: commentaryData } = useBibleCommentary(book, chapterNumber, isMobile);
   const { books } = useBibleBooks();
   const [selectedVerse, setSelectedVerse] = useState<number | null>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const bookData = books.find((b) => b.codigo === book);
   const bookName = bookData?.nombre || book.toUpperCase();
@@ -69,6 +70,68 @@ export function BibleText({
   }, [commentaryData]);
 
   useEffect(() => {
+    if (!isMobile || loading || typeof window === "undefined") return;
+
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const storageKey = `bible-sidekick:bible-scroll:${encodeURIComponent(version)}:${encodeURIComponent(book)}:${encodeURIComponent(chapter)}`;
+    let frameId: number | null = null;
+    let pendingScrollTop: number | null = null;
+
+    try {
+      const savedScrollTop = window.localStorage.getItem(storageKey);
+      if (savedScrollTop !== null && savedScrollTop.trim() !== "") {
+        const parsedScrollTop = Number(savedScrollTop);
+        if (Number.isFinite(parsedScrollTop)) {
+          const maxScrollTop = Math.max(0, container.scrollHeight - container.clientHeight);
+          container.scrollTop = Math.min(Math.max(parsedScrollTop, 0), maxScrollTop);
+        }
+      }
+    } catch {
+      // localStorage may be unavailable in private browsing or restricted contexts.
+    }
+
+    const flushPendingScroll = () => {
+      if (pendingScrollTop === null) return;
+
+      const scrollTop = pendingScrollTop;
+      pendingScrollTop = null;
+
+      if (frameId !== null) {
+        window.cancelAnimationFrame(frameId);
+        frameId = null;
+      }
+
+      try {
+        window.localStorage.setItem(storageKey, String(scrollTop));
+      } catch {
+        // Ignore storage failures so scrolling remains functional.
+      }
+    };
+
+    const handleScroll = () => {
+      pendingScrollTop = container.scrollTop;
+      if (frameId !== null) return;
+
+      frameId = window.requestAnimationFrame(flushPendingScroll);
+    };
+
+    const handlePageHide = () => {
+      flushPendingScroll();
+    };
+
+    container.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("pagehide", handlePageHide);
+
+    return () => {
+      container.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("pagehide", handlePageHide);
+      flushPendingScroll();
+    };
+  }, [book, chapter, version, isMobile, loading]);
+
+  useEffect(() => {
     setSelectedVerse(null);
   }, [book, chapter, isMobile]);
 
@@ -94,7 +157,7 @@ export function BibleText({
   }
 
   return (
-    <div className="relative h-full overflow-y-auto">
+    <div ref={scrollContainerRef} className="relative h-full overflow-y-auto">
       <div className="max-w-3xl mx-auto px-6 pt-8 pb-[40vh]">
         <h1 className="text-2xl font-bold text-center mb-8 tracking-wide">
           {bookName} {chapter}
