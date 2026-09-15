@@ -46,6 +46,7 @@ const Index = () => {
   const [mobileView, setMobileView] = useState<"bible" | "commentary">("bible");
   const [showNavButtons, setShowNavButtons] = useState(true);
   const hideTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const contentKey = `${book}-${chapter}`;
   
   // Save to localStorage when book, chapter, or version changes
   useEffect(() => {
@@ -249,6 +250,7 @@ const Index = () => {
           <>
             {mobileView === "bible" ? (
               <BibleText
+                key={`${contentKey}-bible`}
                 book={book}
                 chapter={chapter}
                 version={version}
@@ -258,6 +260,7 @@ const Index = () => {
               />
             ) : (
               <CommentaryPanel 
+                key={`${contentKey}-commentary`}
                 book={book} 
                 chapter={chapter}
                 fontSize={fontSize}
@@ -289,6 +292,7 @@ const Index = () => {
           <ResizablePanelGroup direction="horizontal" className="h-full">
             <ResizablePanel defaultSize={50} minSize={30}>
               <BibleText
+                key={`${contentKey}-bible`}
                 book={book}
                 chapter={chapter}
                 version={version}
@@ -301,6 +305,7 @@ const Index = () => {
             
             <ResizablePanel defaultSize={50} minSize={30}>
               <CommentaryPanel 
+                key={`${contentKey}-commentary`}
                 book={book} 
                 chapter={chapter}
                 fontSize={fontSize}
@@ -310,6 +315,7 @@ const Index = () => {
           </ResizablePanelGroup>
         ) : (
           <BibleText
+            key={`${contentKey}-bible`}
             book={book}
             chapter={chapter}
             version={version}
